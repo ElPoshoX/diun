@@ -1,0 +1,36 @@
+version: "3.8" 
+services:
+  diun:
+    image: crazymax/diun:latest
+    container_name: $DIUN_HOSTNAME
+    hostname: $DIUN_HOSTNAME
+    command: serve
+    networks:
+      - $DIUN_NETWORK
+    volumes:
+      - "diun_data:/data"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    environment:
+      TZ: "$TZ"
+      LOG_LEVEL: $DEBUG_LEVEL
+      LOG_JSON: true
+      # Se puede cambiar al gusto
+      DIUN_WATCH_SCHEDULE: "$CRON_CONF"
+      DIUN_WATCH_JITTER: "$JITTER_TIME"
+      DIUN_PROVIDERS_DOCKER: true
+      DIUN_PROVIDERS_DOCKER_WATCHBYDEFAULT: true
+      DIUN_WATCH_RUNONSTARTUP: true
+      DIUN_WATCH_FIRSTCHECKNOTIF: true
+      DIUN_NOTIF_PUSHOVER_TOKEN: $PUSHOVER_TOKEN
+      DIUN_NOTIF_PUSHOVER_RECIPIENT: $PUSHOVER_RECIPIENT
+      DIUN_NOTIF_PUSHOVER_TEMPLATETITLE: "{{ .Entry.Image }} released"
+      DIUN_NOTIF_PUSHOVER_TEMPLATEBODY: "Docker tag {{ .Entry.Image }} which you subscribed to through {{ .Entry.Provider }} provider has been released."
+
+networks:
+  home-server:
+    name: $DIUN_NETWORK
+    external: true
+
+
+volumes:
+  diun_data: {}
